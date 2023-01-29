@@ -1,3 +1,6 @@
+from typing import Tuple
+from time import sleep
+
 class Screen:
     def __init__(self, size: tuple):
         self.height = size[0]
@@ -9,6 +12,11 @@ class Screen:
     
         self.Rect = []
         self.Rect_char = " "
+
+        self._refresh_rate = 0.1
+
+    def refresh_rate(self, refresh_rate: float):
+        self._refresh_rate = refresh_rate
 
     def initscr(self, bg = None):
         if bg:
@@ -22,6 +30,8 @@ class Screen:
 
     def updatescr(self):
         print('\033c\033[H' + self.screen_buffer, end='\r', flush=True)
+
+        return sleep(self._refresh_rate)
 
     def draw_rect(self, rect: str, new_pos: tuple = None, new_scale: tuple = None):
         rect_buf = []
@@ -62,8 +72,6 @@ class Screen:
 
             rows[current_row_index] = ''.join(current_row_chars)
             self.screen_buffer = '\n'.join(rows)
-
-        return self.updatescr()
 
     def init_rect(self, position: tuple, size: tuple, id: str, char: str = ' '):
         if len(char) != 1:
