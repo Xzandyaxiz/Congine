@@ -1,10 +1,14 @@
 from typing import Tuple
 from time import sleep
 
+class Event:
+    def __init__(self) -> None:
+        pass
+
 class Screen:
-    def __init__(self, size: tuple):
+    def __init__(self, size: tuple = (100, 100)):
         self.height = size[0]
-        self.width = size[1]*2
+        self.width = size[1]
 
         self.screen_buffer = ''
         self.bg = '\u2588'
@@ -19,6 +23,8 @@ class Screen:
         self._refresh_rate = refresh_rate
 
     def initscr(self, bg = None):
+        self.screen_buffer = ""
+
         if bg:
             if len(bg) != 1:
                 return Error.ThrowIllegalCharacter(message="self.bg")
@@ -31,12 +37,13 @@ class Screen:
     def updatescr(self):
         print('\033c\033[H' + self.screen_buffer, end='\r', flush=True)
 
+        self.initscr()
         return sleep(self._refresh_rate)
 
     def draw_rect(self, rect: str, new_pos: tuple = None, new_scale: tuple = None):
         rect_buf = []
 
-        rows_to_print = (0, 0)
+        rows_to_print = ()
 
         for rect_i, rect_real in enumerate(self.Rect):
             if not rect_real[2] == rect:
@@ -77,7 +84,7 @@ class Screen:
         if len(char) != 1:
             return Error.ThrowIllegalCharacter('Character must be 1 in length.')
 
-        self.Rect.append([position, size, id, char])
+        self.Rect.append([(position[0], position[1]), (size[0], size[1]), id, char])
 
 class Error:
     def ThrowIllegalCharacter(message=None):

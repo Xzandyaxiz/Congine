@@ -1,36 +1,32 @@
-import congine, sys, termios, tty
+import congine
 
-def getch():
-    fd = sys.stdin.fileno()
-    old_settings = termios.tcgetattr(fd)
-    try:
-        tty.setraw(sys.stdin.fileno())
-        ch = sys.stdin.read(1)
-    finally:
-        termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
-    return ch
+HEIGHT = 50
+WIDTH = 70
 
-screen = congine.Screen((45, 80))
-screen.initscr('v')
-screen.refresh_rate(0.2)
+screen = congine.Screen((HEIGHT, WIDTH))
+screen.initscr('/')
+screen.refresh_rate(0.02)
 
-screen.init_rect((35, 5), (5, 50), "Obstacle", '&')
-screen.init_rect((20, 25), (10, 10), "Player", '%')
+position = (0, 0)
+position_increase = (1, 1)
+scale = (4, 8)
 
-def draw():
-    screen.draw_rect("Player", (20, 20), (10, 10))
-    screen.draw_rect("Obstacle", (35, 5), (5, 60))
+screen.init_rect(position, scale, "Player")
 
+while True:
+    if position[0] + scale[0] >= HEIGHT:
+        position_increase = (-1, position_increase[1])
+
+    if position[0] <= 0:
+        position_increase = (1, position_increase[1])
+
+    if position[1] + scale[1] >= WIDTH:
+        position_increase = (position_increase[0], -1)
+
+    if position[1] <= 0:
+        position_increase = (position_increase[0], 1)
+
+    position = (position[0]+position_increase[0], position[1]+position_increase[1])
+
+    screen.draw_rect("Player", position, scale)
     screen.updatescr()
-
-def run():
-    while True:
-        draw()
-
-        key = getch()
-
-        if key == 'q':
-            break
-
-if __name__ == "__main__":
-    run()
